@@ -38,5 +38,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     //Face detector api
-    implementation 'com.google.android.gms:play-services-vision:11.0.4'
+//    implementation 'com.google.android.gms:play-services-vision:11.0.4'
+    implementation 'com.google.android.gms:play-services-vision:20.1.2'
 }

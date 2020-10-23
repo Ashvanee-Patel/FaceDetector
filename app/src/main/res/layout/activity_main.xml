@@ -10,17 +10,21 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".MainActivity">
+        tools:context=".MainActivity"
+        >
 
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:layout_marginTop="8dp"
             app:srcCompat="@android:drawable/ic_menu_camera"
+
             />
         <TextView
+            android:visibility="gone"
             android:id="@+id/txtSampleDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,6 +34,7 @@
 
 
         <Button
+            android:visibility="gone"
             android:id="@+id/btnProcessNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,8 +47,9 @@
             android:id="@+id/imgTakePic"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:layout_marginTop="8dp"
-            app:srcCompat="@android:drawable/ic_menu_camera" />
+            app:srcCompat="@android:drawable/ic_menu_camera"
+            android:background="@color/black"
+            />
 
         <TextView
             android:id="@+id/txtTakePicture"

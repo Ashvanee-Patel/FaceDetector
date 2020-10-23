@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String SAVED_INSTANCE_URI = "uri";
     private static final String SAVED_INSTANCE_BITMAP = "bitmap";
 
+
+    Bitmap earringBitmap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +66,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageArray = new int[]{R.drawable.ashvanee_img,R.drawable.ashvanee2};
         detector = new FaceDetector.Builder(getApplicationContext())
                 .setTrackingEnabled(false)
-                .setLandmarkType(FaceDetector.ALL_CLASSIFICATIONS)
+                /*.setLandmarkType(FaceDetector.ALL_CLASSIFICATIONS)*/
+                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                /*.setMode(FaceDetector.FAST_MODE)*/
+                .setMode(FaceDetector.ACCURATE_MODE)
                 .build();
 
         initViews();
@@ -255,9 +260,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void processCameraPicture() throws Exception {
         Bitmap bitmap = decodeBitmapUri(this, imageUri);
+        earringBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.earring);
+        earringBitmap = Bitmap.createScaledBitmap(
+                earringBitmap, 120, 140, false);
+
+
         if (detector.isOperational() && bitmap != null) {
-            editedBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap
-                    .getHeight(), bitmap.getConfig());
+            editedBitmap = Bitmap.createBitmap(
+                    bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig()
+            );
             float scale = getResources().getDisplayMetrics().density;
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setColor(Color.GREEN);
@@ -265,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             paint.setShadowLayer(1f, 0f, 1f, Color.WHITE);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(6f);
+
             Canvas canvas = new Canvas(editedBitmap);
             canvas.drawBitmap(bitmap, 0, 0, paint);
             Frame frame = new Frame.Builder().setBitmap(editedBitmap).build();
@@ -273,29 +285,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             for (int index = 0; index < faces.size(); ++index) {
                 Face face = faces.valueAt(index);
-                canvas.drawRect(
+               /* canvas.drawRect(
                         face.getPosition().x,
                         face.getPosition().y,
                         face.getPosition().x + face.getWidth(),
                         face.getPosition().y + face.getHeight(), paint);
 
 
-                canvas.drawText("Face " + (index + 1), face.getPosition().x + face.getWidth(), face.getPosition().y + face.getHeight(), paint);
+                canvas.drawText("Face " + (index + 1), face.getPosition().x + face.getWidth(), face.getPosition().y + face.getHeight(), paint);*/
 
                 txtTakenPicDesc.setText("FACE " + (index + 1) + "\n");
                 txtTakenPicDesc.setText(txtTakenPicDesc.getText() + "Smile probability:" + " " + face.getIsSmilingProbability() + "\n");
                 txtTakenPicDesc.setText(txtTakenPicDesc.getText() + "Left Eye Is Open Probability: " + " " + face.getIsLeftEyeOpenProbability() + "\n");
-                txtTakenPicDesc.setText(txtTakenPicDesc.getText() + "Right Eye Is Open Probability: " + " " + face.getIsRightEyeOpenProbability() + "\n\n");
+                txtTakenPicDesc.setText(txtTakenPicDesc.getText() + "Right Eye Is Open Probability: " + " " + face.getIsRightEyeOpenProbability() + "\n");
+//                txtTakenPicDesc.setText(txtTakenPicDesc.getText() + "Ear: " + " " + face.getEulerY() + "\n\n");
+
 
                 for (Landmark landmark : face.getLandmarks()) {
                     int cx = (int) (landmark.getPosition().x);
                     int cy = (int) (landmark.getPosition().y);
-                    canvas.drawCircle(cx, cy, 8, paint);
+
+//                    System.out.println("landmark.getType() "+landmark.getType());
+
+                    // Heart Drawing
+                    if(landmark.getType() == Landmark.LEFT_EAR){
+                        int scaleWidth = earringBitmap.getScaledWidth(canvas);
+                        int scaleHeight = earringBitmap.getScaledHeight(canvas);
+                        System.out.println("scaleWidth "+scaleWidth);
+                        System.out.println("scaleHeight "+scaleHeight);
+                        System.out.println("cx "+cx);
+                        System.out.println("cy "+cy);
+//                        canvas.drawBitmap(earingBitmap,cx-500,cy-(scaleHeight+120),null);
+/*//                        canvas.drawBitmap(earringBitmap,cx-(scaleWidth/2),cy,null);*/
+                    }
+
+                    else  if(landmark.getType() == Landmark.RIGHT_EAR){
+                        int scaleWidth = earringBitmap.getScaledWidth(canvas);
+                        int scaleHeight = earringBitmap.getScaledHeight(canvas);
+                        System.out.println("scaleWidth "+scaleWidth);
+                        System.out.println("scaleHeight "+scaleHeight);
+                        System.out.println("cx "+cx);
+                        System.out.println("cy "+cy);
+//                        canvas.drawBitmap(earingBitmap,cx-500,cy-(scaleHeight+120),null);
+                        canvas.drawBitmap(earringBitmap,cx,cy,null);
+                    }
+//                    canvas.drawCircle(cx, cy, 10, paint);
                 }
-
-
             }
-
             if (faces.size() == 0) {
                 txtTakenPicDesc.setText("Scan Failed: Found nothing to scan");
             } else {
@@ -308,8 +344,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private Bitmap decodeBitmapUri(Context ctx, Uri uri) throws FileNotFoundException {
-        int targetW = 400;
-        int targetH = 400;
+        int targetW = 480;
+        int targetH = 360;
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeStream(ctx.getContentResolver().openInputStream(uri), null, bmOptions);
